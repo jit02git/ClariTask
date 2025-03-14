@@ -28,6 +28,8 @@ export default async function TodosPage({ searchParams }) {
         fontFamily: "Arial, sans-serif",
       }}
     >
+      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Todo</h1>
+
       {/* Sidebar */}
       <div
         style={{
