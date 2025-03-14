@@ -37,22 +37,22 @@ export default async function TodosPage({ searchParams }) {
           borderRight: "1px solid #ddd",
         }}
       >
-        <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Todo</h1>
         {/* Button to Add New Todo */}
         <Link
           href="/todos/new"
           style={{
             display: "block",
             padding: "10px",
-            backgroundColor: "#0070f3",
+            backgroundColor: "black",
             color: "#fff",
+            width: "50%",
             textAlign: "center",
             borderRadius: "5px",
             textDecoration: "none",
             marginBottom: "20px",
           }}
         >
-          Add New Todo
+          icon Todo
         </Link>
         {/* List of Todos */}
         <ul style={{ listStyle: "none", padding: 0 }}>
@@ -152,6 +152,39 @@ export default async function TodosPage({ searchParams }) {
                 Update
               </button>
             </form>
+
+            <script>
+              {`
+    document.getElementById('edit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const title = formData.get('title');
+      const description = formData.get('description');
+      const id = '${selectedTodo._id}';
+
+      try {
+        const response = await fetch('/api/todos/${selectedTodo._id}', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title, description }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          window.location.href = '/todos?id=' + id;
+        } else {
+          alert('Failed to update todo');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while updating the todo');
+      }
+    });
+  `}
+            </script>
+
             <script>
               {`
                 document.getElementById('edit-form').addEventListener('submit', async (e) => {

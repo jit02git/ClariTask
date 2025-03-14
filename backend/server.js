@@ -11,6 +11,14 @@ const PORT = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  if (req.body && req.body._method) {
+    req.method = req.body._method;
+    delete req.body._method;
+  }
+  next();
+});
+
 // MongoDB connection
 mongoose.connect("mongodb://localhost:27017/todoapp", {
   useNewUrlParser: true,
@@ -54,11 +62,14 @@ app.put("/api/todos/:id", async (req, res) => {
   const { id } = req.params;
   const { title, description } = req.body;
 
+  console.log("Update Request ID:", id);
+  console.log("Data Received:", title, description);
+
   try {
     const updatedTodo = await Todo.findByIdAndUpdate(
       id,
       { title, description },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (!updatedTodo) {

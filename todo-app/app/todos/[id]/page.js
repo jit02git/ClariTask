@@ -1,62 +1,43 @@
-"use client"; // Mark this component as a Client Component
+import { useRouter } from "next/navigation";
 
-import axios from "axios";
-import { useEffect } from "react";
+export default function TodoDetailPage({ params }) {
+  const router = useRouter();
 
-const fetchTodo = async (id) => {
-  const res = await axios.get(`http://localhost:5000/api/todos/${id}`);
-  return res.data;
-};
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const title = formData.get("title");
+    const description = formData.get("description");
 
-export default async function TodoDetailPage({ params }) {
-  const todo = await fetchTodo(params.id);
+    try {
+      const res = await fetch(`/api/todos/${params.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, description }),
+      });
 
-  useEffect(() => {
-    const form = document.getElementById("edit-form");
-    if (form) {
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const title = formData.get("title");
-        const description = formData.get("description");
-        const id = todo._id;
-
-        try {
-          const response = await fetch(`/api/todos/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ title, description }),
-          });
-
-          if (response.ok) {
-            window.location.href = `/todos?id=${id}`;
-          } else {
-            alert("Failed to update todo");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          alert("An error occurred while updating the todo");
-        }
-      };
-
-      form.addEventListener("submit", handleSubmit);
-
-      // Cleanup the event listener on unmount
-      return () => {
-        form.removeEventListener("submit", handleSubmit);
-      };
+      if (res.ok) {
+        router.push(`/todos?id=${params.id}`);
+      } else {
+        alert("Failed to update todo");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("An error occurred while updating the todo.");
     }
-  }, [todo._id]);
+  };
 
   return (
     <div style={{ flex: 1, padding: "20px" }}>
       <h2 style={{ fontSize: "20px", marginBottom: "20px" }}>Edit Todo</h2>
       <form
-        id="edit-form"
+        action={`/api/todos/${todo._id}`}
+        method="POST"
         style={{ display: "flex", flexDirection: "column", gap: "10px" }}
       >
+        <input type="hidden" name="_method" value="PUT" />
         <input
           type="text"
           name="title"
