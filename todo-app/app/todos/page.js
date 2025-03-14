@@ -20,15 +20,18 @@ export default async function TodosPage({ searchParams }) {
   const { todos, total, limit } = await fetchTodos(page);
   const selectedTodo = selectedTodoId ? await fetchTodo(selectedTodoId) : null;
 
-  return (
-    <div
+  return (<>
+<div style= {{
+  width: "10%", marginLeft: "25px", margin:"5px"
+}}>      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>icon Todo</h1>
+</div>
+<div
       style={{
         display: "flex",
         height: "100vh",
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Todo</h1>
 
       {/* Sidebar */}
       <div
@@ -39,6 +42,8 @@ export default async function TodosPage({ searchParams }) {
           borderRight: "1px solid #ddd",
         }}
       >
+<div style={{display:"flex", justifyContent:"space-around"}}>
+
         {/* Button to Add New Todo */}
         <Link
           href="/todos/new"
@@ -56,6 +61,10 @@ export default async function TodosPage({ searchParams }) {
         >
           icon Todo
         </Link>
+
+        delete icon
+
+        </div>
         {/* List of Todos */}
         <ul style={{ listStyle: "none", padding: 0 }}>
           {todos.map((todo) => (
@@ -108,7 +117,17 @@ export default async function TodosPage({ searchParams }) {
       </div>
 
       {/* Right Panel (Edit Todo) */}
-      <div style={{ flex: 1, padding: "20px" }}>
+      <div style={{ flex: 1, padding: "20px", margin:"5px",
+      display: "block",
+            padding: "10px",
+            // width: "50%",
+            width: "300px",
+            // backgroundColor: "#f4f4f4",
+
+            // textAlign: "center",
+            borderRadius: "5px",
+            // textDecoration: "none",
+            margin: "20px" }}>
         {selectedTodo ? (
           <>
             <h2 style={{ fontSize: "20px", marginBottom: "20px" }}>
@@ -218,10 +237,17 @@ export default async function TodosPage({ searchParams }) {
               `}
             </script>
           </>
-        ) : (
-          <p>Select a todo from the sidebar to edit.</p>
+        ) : (<div style={{margin:"10px"}}>
+        <div style={{display:"flex", justifyContent:"space-between"}}>
+        <h1 style={{font:"bold", fontSize:"45px", marginBottom:"5px"}}> New Additions</h1>
+        icon</div>
+        <div style={{display:"flex", justifyContent:"space-between"}}>
+        icon1, icon2, icon3, icon4, icon5</div>
+        <hr style={{font:"45px", color:"gray", marginTop: "5px"}}></hr>
+          <p style={{marginTop:"15px"}}>Select a todo from the sidebar to edit.</p></div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
