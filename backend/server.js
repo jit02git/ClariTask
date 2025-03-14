@@ -27,10 +27,16 @@ const Todo = mongoose.model("Todo", todoSchema);
 
 // Routes
 app.post("/api/todos", async (req, res) => {
-  const { title, description } = req.body;
-  const newTodo = new Todo({ title, description });
-  await newTodo.save();
-  res.status(201).json(newTodo);
+  try {
+    const { title, description } = req.body;
+    const newTodo = new Todo({ title, description });
+    await newTodo.save();
+    console.log("newTodo", newTodo);
+    res.status(201).json(newTodo);
+  } catch (error) {
+    console.error("Error creating todo:", error);
+    res.status(500).json({ error: "Failed to create todo" });
+  }
 });
 
 app.get("/api/todos", async (req, res) => {
@@ -47,12 +53,23 @@ app.get("/api/todos", async (req, res) => {
 app.put("/api/todos/:id", async (req, res) => {
   const { id } = req.params;
   const { title, description } = req.body;
-  const updatedTodo = await Todo.findByIdAndUpdate(
-    id,
-    { title, description },
-    { new: true }
-  );
-  res.json(updatedTodo);
+
+  try {
+    const updatedTodo = await Todo.findByIdAndUpdate(
+      id,
+      { title, description },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedTodo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.json(updatedTodo);
+  } catch (error) {
+    console.error("Error updating todo:", error);
+    res.status(500).json({ error: "Failed to update todo" });
+  }
 });
 
 app.get("/api/todos/:id", async (req, res) => {

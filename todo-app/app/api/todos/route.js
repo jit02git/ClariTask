@@ -7,5 +7,5 @@ export async function POST(request) {
 
   await axios.post("http://localhost:5000/api/todos", { title, description });
 
-  return Response.redirect("/todos");
+  return Response.redirect("http://localhost:3000/todos");
 }

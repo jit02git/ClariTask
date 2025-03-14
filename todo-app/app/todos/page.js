@@ -6,9 +6,19 @@ const fetchTodos = async (page = 1) => {
   return res.data;
 };
 
+const fetchTodo = async (id) => {
+  const res = await axios.get(`http://localhost:5000/api/todos/${id}`);
+  return res.data;
+};
+
 export default async function TodosPage({ searchParams }) {
+  // Await searchParams before using its properties
   const page = parseInt(searchParams.page) || 1;
+  const selectedTodoId = searchParams.id;
+
+  // Fetch todos and selected todo
   const { todos, total, limit } = await fetchTodos(page);
+  const selectedTodo = selectedTodoId ? await fetchTodo(selectedTodoId) : null;
 
   return (
     <div
@@ -49,7 +59,7 @@ export default async function TodosPage({ searchParams }) {
           {todos.map((todo) => (
             <li key={todo._id} style={{ marginBottom: "10px" }}>
               <Link
-                href={`/todos/${todo._id}`}
+                href={`/todos?page=${page}&id=${todo._id}`}
                 style={{
                   display: "block",
                   padding: "10px",
@@ -95,10 +105,87 @@ export default async function TodosPage({ searchParams }) {
         </div>
       </div>
 
-      {/* Right Panel (Placeholder for Editing) */}
+      {/* Right Panel (Edit Todo) */}
       <div style={{ flex: 1, padding: "20px" }}>
-        <h2 style={{ fontSize: "20px", marginBottom: "20px" }}>Edit Todo</h2>
-        <p>Select a todo from the sidebar to edit.</p>
+        {selectedTodo ? (
+          <>
+            <h2 style={{ fontSize: "20px", marginBottom: "20px" }}>
+              Edit Todo
+            </h2>
+            <form
+              id="edit-form"
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            >
+              <input
+                type="text"
+                name="title"
+                defaultValue={selectedTodo.title}
+                style={{
+                  padding: "10px",
+                  fontSize: "16px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                }}
+              />
+              <textarea
+                name="description"
+                defaultValue={selectedTodo.description}
+                style={{
+                  padding: "10px",
+                  fontSize: "16px",
+                  borderRadius: "5px",
+                  border: "1px solid #ddd",
+                  minHeight: "100px",
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#0070f3",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Update
+              </button>
+            </form>
+            <script>
+              {`
+                document.getElementById('edit-form').addEventListener('submit', async (e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target);
+                  const title = formData.get('title');
+                  const description = formData.get('description');
+                  const id = '${selectedTodo._id}';
+
+                  try {
+                    const response = await fetch(\`/api/todos/\${id}\`, {
+                      method: 'PUT',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ title, description }),
+                    });
+
+                    if (response.ok) {
+                      window.location.href = \`/todos?id=\${id}\`;
+                    } else {
+                      alert('Failed to update todo');
+                    }
+                  } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the todo');
+                  }
+                });
+              `}
+            </script>
+          </>
+        ) : (
+          <p>Select a todo from the sidebar to edit.</p>
+        )}
       </div>
     </div>
   );
